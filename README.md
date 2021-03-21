@@ -30,6 +30,3 @@ We would like you to enhance the existing project and see you complete the follo
 - Please make sure the validations are done for the requests.
 - Response codes are as per rest guidelines.
 - Error handling in case of failures.
-
-## Assignment submission
-Thank you very much for your time to take this test. Please upload this complete solution in Github and send us the link to `bfs-sor-interview@paypal.com`.
