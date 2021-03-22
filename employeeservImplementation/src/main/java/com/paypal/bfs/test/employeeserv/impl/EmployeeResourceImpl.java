@@ -99,7 +99,9 @@ public class EmployeeResourceImpl implements EmployeeResource {
 		
 		if(emp == null) 
 			throw new InputFormatException("could not read input employee");
+		
 		EmployeeEntity empEnt = new EmployeeEntity();
+		
 		if(emp.getId() != null) {
 			throw new EmployeeIdFoundException("found id "+emp.getId()+" with employee "
 					+ "creation request, this field is not allowed while creating "

@@ -48,6 +48,14 @@ public class EmployeeService {
 		
 		emp.setId(saved.getId().intValue());
 		
+		emp.getAddress().setCity(saved.getAddress().getCity());
+		emp.getAddress().setState(saved.getAddress().getState());
+		emp.getAddress().setCountry(saved.getAddress().getCountry());
+		emp.getAddress().setZipCode(saved.getAddress().getZipCode());
+		emp.getAddress().setLine1(saved.getAddress().getFirstLine());
+		emp.getAddress().setLine2(saved.getAddress().getSecondLine());
+		emp.getAddress().setId(saved.getAddress().getId().intValue());
+		
 	}
 	
 }
