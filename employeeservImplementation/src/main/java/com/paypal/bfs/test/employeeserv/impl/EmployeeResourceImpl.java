@@ -42,6 +42,14 @@ public class EmployeeResourceImpl implements EmployeeResource {
     public ResponseEntity<Employee> employeeGetById(String id) 
     		throws EmployeeNotFoundException, InputFormatException {
     	
+    	/*
+    	 * 1. point to note here is if any required filed in employee is empty
+    	 * in the database, we do not return it.
+    	 *  
+    	 * 2. The assumption is that the required fields are required only 
+    	 * from the client side
+    	 */
+    	
     	if(id == null) throw new InputFormatException("id field is not valid");
     	
     	Optional<EmployeeEntity> ent = empRepo.findById(Long.parseLong(id));
@@ -64,7 +72,9 @@ public class EmployeeResourceImpl implements EmployeeResource {
     	else addr = null;
     	
     	emp.setAddress(addr);
-    	emp.setDateOfBirth(ent.get().getDateOfBirth().format(dtf));
+    	if(ent.get().getDateOfBirth() != null) 
+    		emp.setDateOfBirth(ent.get().getDateOfBirth().format(dtf));
+    	else emp.setDateOfBirth(null);
     	emp.setFirstName(ent.get().getFirstName());
     	emp.setLastName(ent.get().getLastName());
     	emp.setId(ent.get().getId().intValue());
