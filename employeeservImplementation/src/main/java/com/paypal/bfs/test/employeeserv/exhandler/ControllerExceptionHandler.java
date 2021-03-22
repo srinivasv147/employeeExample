@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.paypal.bfs.test.employeeserv.api.exception.AddressNotFoundException;
 import com.paypal.bfs.test.employeeserv.api.exception.EmployeeIdFoundException;
 import com.paypal.bfs.test.employeeserv.api.exception.EmployeeNotFoundException;
+import com.paypal.bfs.test.employeeserv.api.exception.InputFormatException;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
@@ -30,6 +31,12 @@ public class ControllerExceptionHandler {
 	@ExceptionHandler(EmployeeNotFoundException.class)
     public void springHandleNotFound(HttpServletResponse response) throws IOException {
         response.sendError(HttpStatus.NOT_FOUND.value());
+    }
+	
+	@ExceptionHandler(InputFormatException.class)
+    public void springHandleInputFormat(HttpServletResponse response) 
+    		throws IOException {
+        response.sendError(HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
 }

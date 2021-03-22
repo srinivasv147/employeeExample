@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.paypal.bfs.test.employeeserv.api.exception.InputFormatException;
 import com.paypal.bfs.test.employeeserv.api.model.Employee;
 import com.paypal.bfs.test.employeeserv.entity.AdressEntity;
 import com.paypal.bfs.test.employeeserv.entity.EmployeeEntity;
@@ -25,14 +26,23 @@ public class EmployeeService {
 
 	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public void addEmployee(AdressEntity addEnt, EmployeeEntity empEnt
-			, Employee emp, DateTimeFormatter dtf) {
+			, Employee emp, DateTimeFormatter dtf) throws InputFormatException {
 		
-		AdressEntity adSaved = adRepo.saveAndFlush(addEnt);
+		if(addEnt != null) {
+			AdressEntity adSaved = adRepo.saveAndFlush(addEnt);
+			empEnt.setAddress(adSaved);
+		}
+		else empEnt.setAddress(null);
 		
-		empEnt.setAddress(adSaved);
-		empEnt.setDateOfBirth(LocalDate.parse(emp.getDateOfBirth(), dtf));
-		empEnt.setFirstName(emp.getFirstName());
-		empEnt.setLastName(emp.getLastName());
+		if(emp.getDateOfBirth() != null)
+			empEnt.setDateOfBirth(LocalDate.parse(emp.getDateOfBirth(), dtf));
+		else empEnt.setDateOfBirth(null);
+		
+		if(emp.getFirstName() != null) empEnt.setFirstName(emp.getFirstName());
+		else throw new InputFormatException("no first name specified");
+		
+		if(emp.getLastName() != null) empEnt.setLastName(emp.getLastName());
+		else throw new InputFormatException("no last name specified");
 		
 		EmployeeEntity saved = empRepo.saveAndFlush(empEnt);
 		

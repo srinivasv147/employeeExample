@@ -2,6 +2,7 @@ package com.paypal.bfs.test.employeeserv.entity;
 
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -17,16 +18,22 @@ public class AdressEntity {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
+	@Column(nullable = false)
 	private String firstLine;
 	
+	@Column(nullable = true)
 	private String secondLine;
 	
+	@Column(nullable = false)
 	private String city;
 	
+	@Column(nullable = false)
 	private String state;
 	
+	@Column(nullable = false)
 	private String country;
 	
+	@Column(nullable = false)
 	private Integer zipCode;
 	
 	@OneToMany

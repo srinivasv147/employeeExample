@@ -47,6 +47,7 @@
       "line1",
       "city",
       "state",
-      "country"
+      "country",
+      "zip-code"
     ]
   }

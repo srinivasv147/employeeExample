@@ -20,11 +20,13 @@ public class EmployeeEntity {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long Id;
 	
+	@Column(nullable = false)
 	private String firstName;
 	
+	@Column(nullable = false)
 	private String lastName;
 	
-	@Column
+	@Column(nullable = true)
 	private LocalDate dateOfBirth;
 	
 	@ManyToOne

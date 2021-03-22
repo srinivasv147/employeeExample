@@ -3,6 +3,7 @@ package com.paypal.bfs.test.employeeserv.api;
 import com.paypal.bfs.test.employeeserv.api.exception.AddressNotFoundException;
 import com.paypal.bfs.test.employeeserv.api.exception.EmployeeIdFoundException;
 import com.paypal.bfs.test.employeeserv.api.exception.EmployeeNotFoundException;
+import com.paypal.bfs.test.employeeserv.api.exception.InputFormatException;
 import com.paypal.bfs.test.employeeserv.api.model.Employee;
 
 import org.springframework.http.ResponseEntity;
@@ -21,13 +22,15 @@ public interface EmployeeResource {
      *
      * @param id employee id.
      * @return {@link Employee} resource.
+     * @throws InputFormatException 
      */
     @RequestMapping("/v1/bfs/employees/{id}")
     ResponseEntity<Employee> employeeGetById(@PathVariable("id") String id)
-    		throws EmployeeNotFoundException;
+    		throws EmployeeNotFoundException, InputFormatException;
 
     @PostMapping("/v1/bfs/create-employee")
     ResponseEntity<Employee> createEmployee(@RequestBody Employee emp) 
-    		throws EmployeeIdFoundException, AddressNotFoundException;
+    		throws EmployeeIdFoundException, AddressNotFoundException
+    		, InputFormatException;
     
 }

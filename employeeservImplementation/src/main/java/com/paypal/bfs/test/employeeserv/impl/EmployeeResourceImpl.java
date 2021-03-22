@@ -4,6 +4,7 @@ import com.paypal.bfs.test.employeeserv.api.EmployeeResource;
 import com.paypal.bfs.test.employeeserv.api.exception.AddressNotFoundException;
 import com.paypal.bfs.test.employeeserv.api.exception.EmployeeIdFoundException;
 import com.paypal.bfs.test.employeeserv.api.exception.EmployeeNotFoundException;
+import com.paypal.bfs.test.employeeserv.api.exception.InputFormatException;
 import com.paypal.bfs.test.employeeserv.api.model.Address;
 import com.paypal.bfs.test.employeeserv.api.model.Employee;
 import com.paypal.bfs.test.employeeserv.entity.AdressEntity;
@@ -12,7 +13,6 @@ import com.paypal.bfs.test.employeeserv.repository.AddressRepository;
 import com.paypal.bfs.test.employeeserv.repository.EmployeeRepository;
 import com.paypal.bfs.test.employeeserv.service.EmployeeService;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
@@ -40,7 +40,9 @@ public class EmployeeResourceImpl implements EmployeeResource {
 
     @Override
     public ResponseEntity<Employee> employeeGetById(String id) 
-    		throws EmployeeNotFoundException {
+    		throws EmployeeNotFoundException, InputFormatException {
+    	
+    	if(id == null) throw new InputFormatException("id field is not valid");
     	
     	Optional<EmployeeEntity> ent = empRepo.findById(Long.parseLong(id));
     	
@@ -50,12 +52,17 @@ public class EmployeeResourceImpl implements EmployeeResource {
     	
     	Employee emp = new Employee();
     	Address addr = new Address();
-    	addr.setCity(ent.get().getAddress().getCity());
-    	addr.setCountry(ent.get().getAddress().getCountry());
-    	addr.setLine1(ent.get().getAddress().getFirstLine());
-    	addr.setLine2(ent.get().getAddress().getSecondLine());
-    	addr.setState(ent.get().getAddress().getState());
-    	addr.setZipCode(ent.get().getAddress().getZipCode());
+    	
+    	if(ent.get().getAddress() != null) {
+    		addr.setCity(ent.get().getAddress().getCity());
+        	addr.setCountry(ent.get().getAddress().getCountry());
+        	addr.setLine1(ent.get().getAddress().getFirstLine());
+        	addr.setLine2(ent.get().getAddress().getSecondLine());
+        	addr.setState(ent.get().getAddress().getState());
+        	addr.setZipCode(ent.get().getAddress().getZipCode());
+    	}
+    	else addr = null;
+    	
     	emp.setAddress(addr);
     	emp.setDateOfBirth(ent.get().getDateOfBirth().format(dtf));
     	emp.setFirstName(ent.get().getFirstName());
@@ -67,7 +74,8 @@ public class EmployeeResourceImpl implements EmployeeResource {
 
 	@Override
 	public ResponseEntity<Employee> createEmployee(Employee emp) 
-			throws EmployeeIdFoundException, AddressNotFoundException {
+			throws EmployeeIdFoundException, AddressNotFoundException
+			, InputFormatException {
 		
 		/*
 		 * for employee creation the edge case handling is as follows.
@@ -79,6 +87,8 @@ public class EmployeeResourceImpl implements EmployeeResource {
 		 * 5. if address has an id that does not exist then exception is thrown.
 		 */
 		
+		if(emp == null) 
+			throw new InputFormatException("could not read input employee");
 		EmployeeEntity empEnt = new EmployeeEntity();
 		if(emp.getId() != null) {
 			throw new EmployeeIdFoundException("found id "+emp.getId()+" with employee "
@@ -88,6 +98,11 @@ public class EmployeeResourceImpl implements EmployeeResource {
 		
 		AdressEntity addEnt = new AdressEntity();
 		
+		if(emp.getAddress() == null) {
+			empSer.addEmployee(null, empEnt, emp, dtf);
+			return new ResponseEntity<>(emp, HttpStatus.OK);
+		}
+		
 		if(emp.getAddress().getId() != null) {
 			Optional<AdressEntity> adent = adRepo.findById(emp.getAddress().getId()*1L);
 			if(!adent.isPresent()) {
@@ -96,16 +111,31 @@ public class EmployeeResourceImpl implements EmployeeResource {
 								+ "if you want to add new address, remove the id field"
 								+ " in the address");
 			}
+			addEnt = adent.get();
 		}
 		else {
-			addEnt.setFirstLine(emp.getAddress().getLine1());
+			if(emp.getAddress().getLine1() != null)
+				addEnt.setFirstLine(emp.getAddress().getLine1());
+			else throw new InputFormatException("line 1 of address is mandatory");
 			addEnt.setSecondLine(emp.getAddress().getLine2());
-			addEnt.setCity(emp.getAddress().getCity());
-			addEnt.setState(emp.getAddress().getState());
-			addEnt.setCountry(emp.getAddress().getCountry());
-			addEnt.setZipCode(emp.getAddress().getZipCode());
+			if(emp.getAddress().getCity() != null)
+				addEnt.setCity(emp.getAddress().getCity());
+			else
+				throw new InputFormatException("city field of address is mandatory");
+			if(emp.getAddress().getState() != null)
+				addEnt.setState(emp.getAddress().getState());
+			else
+				throw new InputFormatException("state field of address is mandatory");
+			if(emp.getAddress().getCountry() != null)
+				addEnt.setCountry(emp.getAddress().getCountry());
+			else
+				throw new InputFormatException("country field of address is madatory");
+			if(emp.getAddress().getZipCode() != null)
+				addEnt.setZipCode(emp.getAddress().getZipCode());
+			else
+				throw new InputFormatException("zip-code filed of address is madatory");
 		}
-		
+
 		empSer.addEmployee(addEnt, empEnt, emp, dtf);
 		
 		return new ResponseEntity<>(emp, HttpStatus.OK);
